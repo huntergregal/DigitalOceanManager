@@ -127,25 +127,91 @@ def powerControlDroplets(manager):
         name = raw_input("Name of Droplet to Shutdown: ")
         print "Shutting down", name +"..."
         for droplet in droplets:
-            if name == droplet.name:
+            if name == str(droplet.name):
                 droplet.shutdown()
+                print "Droplet", name, "successfully shutdown"
                 
     elif (choice == "2"):
         for droplet in droplets:
             if "active" in droplet.status:
                 droplet_info(droplet)
+        print "#################################"
+        name = raw_input("Name of Droplet to Restart: ")
+        print "Restarting", name +"..."
+        for droplet in droplets:
+            if name == str(droplet.name):
+                droplet.power_cycle()
+                print "Droplet", name,"succesfully restarted"
+
     elif (choice == "3"):
         for droplet in droplets:
             if "off" in droplet.status:
                 droplet_info(droplet)
+        print "#################################"
+        name = raw_input("Name of Droplet to Boot: ")
+        print "Booting", name +"..."
+        for droplet in droplets:
+            if name == str(droplet.name):
+                droplet.power_on()
+                print "Droplet", name, "successfully booted"
+                print "Droplet", name," succesfully restarted"
     else:  
         print "\nInvalid Choice!"
     
     raw_input("Press Enter to Continue...")
     menu(manager)
-    0
-def createDroplets(manager):
-    0
+
+def createDroplets():
+    createDropletsMenu(droplets)
+
+def createDropletsMenu():
+    print "\n#################################\n"
+    choice = raw_input("Number of Droplets to Create: ")
+    if choice == "1":
+        name = raw_input("Name of Droplet: ")
+        print "#################################"
+        print "Regions"
+        print "1) New York"
+        print "2) Amsterdam"
+        print "3) San Francisco"
+        print "4) Singapore"
+        print "5) London"
+        print "6) Frankfurt"
+        print "7) Toronto"
+        region = raw_input("Region to Use: ")
+        if region == "1":
+            region = "nyc3"
+        if region == "2":
+            region = "ams3"
+        if region == "3":
+            region = "sfo1"
+        if region == "4":
+            region = "sgp1"
+        if region == "5":
+            region = "lon1"
+        if region == "6":
+            region = "fra1"
+        if region == "7":
+            region = "tor1"
+        print "#################################"
+        print "Images"
+        print "1) Ubuntu 14 x32"
+        print "2) Ubuntu 14 x64"
+        print "3) FreeBSD 10.2"
+        print "4) Fedora 23 x64"
+        print "5) Debian 8.2 x32"
+        print "6) Debian 8.2 x64"
+        print "7) CoreOS 884"
+        print "8) CentOS 7.1 x64"
+        image = raw_input("Image to Use: ")
+        if image == "1"):
+        if image == "1"):
+        if image == "1"):
+        if image == "1"):
+        if image == "1"):
+        if image == "1"):
+        if image == "1"):
+        if image == "1"):
 def destroyDroplets(manager):
     0
 def listImages(manager):
