@@ -64,7 +64,7 @@ def processOptions(manager):
     elif (choice == "2"):
         powerControlDroplets(manager)
     elif (choice == "3"):
-        createDroplets()
+        createDroplets(manager)
     elif (choice == "4"):
         destroyDroplets()
     elif (choice == "5"):
@@ -161,57 +161,178 @@ def powerControlDroplets(manager):
     raw_input("Press Enter to Continue...")
     menu(manager)
 
-def createDroplets():
-    createDropletsMenu(droplets)
+def createDroplets(manager):
+    createDropletsMenu(manager)
 
-def createDropletsMenu():
+def createDropletsMenu(manager):
+    #how many droplets?
     print "\n#################################\n"
-    choice = raw_input("Number of Droplets to Create: ")
-    if choice == "1":
+    number = ""
+    number = raw_input("Number of Droplets to Create: ")
+    #if one get its name
+    name = False
+    suffix = False
+    if number == "1":
         name = raw_input("Name of Droplet: ")
-        print "#################################"
-        print "Regions"
-        print "1) New York"
-        print "2) Amsterdam"
-        print "3) San Francisco"
-        print "4) Singapore"
-        print "5) London"
-        print "6) Frankfurt"
-        print "7) Toronto"
-        region = raw_input("Region to Use: ")
-        if region == "1":
-            region = "nyc3"
-        if region == "2":
-            region = "ams3"
-        if region == "3":
-            region = "sfo1"
-        if region == "4":
-            region = "sgp1"
-        if region == "5":
-            region = "lon1"
-        if region == "6":
-            region = "fra1"
-        if region == "7":
-            region = "tor1"
-        print "#################################"
-        print "Images"
-        print "1) Ubuntu 14 x32"
-        print "2) Ubuntu 14 x64"
-        print "3) FreeBSD 10.2"
-        print "4) Fedora 23 x64"
-        print "5) Debian 8.2 x32"
-        print "6) Debian 8.2 x64"
-        print "7) CoreOS 884"
-        print "8) CentOS 7.1 x64"
-        image = raw_input("Image to Use: ")
-        if image == "1"):
-        if image == "1"):
-        if image == "1"):
-        if image == "1"):
-        if image == "1"):
-        if image == "1"):
-        if image == "1"):
-        if image == "1"):
+    #if more than 1, get a suffix
+    elif number > 1:
+        prefix = raw_input("Suffix of droplets: ")
+    #derp out
+    else:
+        print "Invalid number!"
+        menu(manager)
+
+    #select region to use
+    print "#################################"
+    print "Regions"
+    print "1) New York"
+    print "2) Amsterdam"
+    print "3) San Francisco"
+    print "4) Singapore"
+    print "5) London"
+    print "6) Frankfurt"
+    print "7) Toronto"
+    region = ""
+    region = raw_input("Region to Use: ")
+    if region == "1":
+        region = "nyc3"
+    elif region == "2":
+        region = "ams3"
+    elif region == "3":
+        region = "sfo1"
+    elif region == "4":
+        region = "sgp1"
+    elif region == "5":
+        region = "lon1"
+    elif region == "6":
+        region = "fra1"
+    elif region == "7":
+        region = "tor1"
+    else:
+        print "Invalid Option!"
+        menu(manager)
+
+    #select image to use
+    print "#################################"
+    print "Images"
+    print "1) Ubuntu 14 x32"
+    print "2) Ubuntu 14 x64"
+    print "3) FreeBSD 10 x64"
+    print "4) Fedora 22 x64"
+    print "5) Debian 8 x32"
+    print "6) Debian 8 x64"
+    print "7) CoreOS 877 beta"
+    print "8) CentOS 7 x64"
+    image = ""
+    image = raw_input("Image to Use: ")
+    if image == "1"):
+        image = "ubuntu-14-04-x32"
+    elif image == "2"):
+        image = "ubuntu-14-04-x64"
+    elif image == "3"):
+        image = "freebsd-10-2-x64"
+    elif image == "4"):
+        image = "fedora-22-x64"
+    elif image == "5"):
+        image = "debian-8-x32"
+    elif image == "6"):
+        image = "debian-8-x64"
+    elif image == "7"):
+        image = "coreos-beta"
+    elif image == "8"):
+        image = "centos-7-0-x64"
+    else:
+        print "Invalid Option!"
+        menu(manager)
+
+    #select slug_size
+    print "#################################"
+    print "Droplet Size"
+    print "1) 512mb"
+    print "2) 1gb"
+    print "3) 2gb"
+    print "4) 4gb"
+    print "5) 8gb"
+    print "6) 16gb"
+    print "7) 32gb"
+    print "8) 48gb"
+    print "9) 64gb"
+    size = ""
+    size = raw_input("Droplet Size to Use: ")
+    if size == "1":
+        size = "512mb"
+    elif size == "2":
+        size = "1gb"
+    elif size == "3":
+        size = "2gb"
+    elif size == "4":
+        size = "4gb"
+    elif size == "5":
+        size = "8gb"
+    elif size == "6":
+        size = "16gb"
+    elif size == "7":
+        size = "32gb"
+    elif size == "8":
+        size = "48gb"
+    elif size == "9":
+        size = "64gb"
+    else:
+        print "Invalid Option!"
+        menu(manager)
+
+    #backups yes/no
+    print "#################################"
+    print "Would you like backups enabled?"
+    backups = ""
+    backups = raw_input("y/n: ")
+    if backups == "y" or backups == "Y":
+        backups = True
+    elif backups == "n" or backups == "N":
+        backups = False
+    else:
+        print "Invalid Option!"
+        menu(manager)
+   
+    #Final Confirmation
+    print "#################################"
+    print "!! WARNING !! ACCOUNT WILL BE CHARGED !!"
+    print "#################################"
+    print "You are about to create", number, "droplets with the name/suffix of", name, "with the following specs:"
+    print "Region:", region
+    print "Image:", image
+    print "Size:", size
+    print "Backups:", str(backups)
+    print "#################################"
+    confirm = raw_input("Are you sure you want to continue? [y/n]: ")
+    #if no backout
+    if confirm == "n" or confirm == "N":
+        menu(manager)
+    #if yes launch it
+    elif confirm == "y" or confirm == "Y":
+        #if multiple, use suffix
+        if suffix:
+            number = int(number)
+            i = 0
+            while i < number:
+                droplet = do.Droplet(token=initManager.secretToken,
+                        name = suffix + "-" + str(i),
+                        region = region,
+                        image = image,
+                        size_slug = size,
+                        backups = backups)
+                print "Droplet", str(i), "Created"
+                i = i + 1
+            print "Droplets successfully created!"
+        if name:
+            droplet = do.Droplet(token=initManager.secretToken,
+                    name = name,
+                    region = region,
+                    image = image,
+                    size_slug = size,
+                    backups = backups)
+            print "Droplet successfully created!"
+
 def destroyDroplets(manager):
     0
 def listImages(manager):
