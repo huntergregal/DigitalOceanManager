@@ -21,7 +21,7 @@ def initManager():
     secretToken = f.readline()
     f.close()
     manager = do.Manager(token=secretToken)
-    return manager
+    return manager,secretToken
 
 def setup():
     print "Please paste your Digital Ocean API token below"
@@ -41,11 +41,11 @@ def checkSetup():
             print "Please setup your Digital Ocean API token to continue..."
             sys.exit(0)
 
-def menu(manager):
+def menu(manager,secretToken):
     os.system("clear")
-    print "\n#################################"
-    print "Welcome to the Digital Ocean Manager!\n Please choose an option number below\n"
-    print "#################################\n"
+    print "#################################"
+    print "Welcome to the Digital Ocean Manager!\nPlease choose an option number below"
+    print "#################################"
 
     print "1) List Droplets (All, Running, Off)"
     print "2) Droplets Power Control (Shutdown, Restart, Boot)"
@@ -54,19 +54,19 @@ def menu(manager):
     print "5) List Images (Snapshots, Backups)"
     print "6) Advanced Droplet Management (Snapshots, Backups, Reset Root Password)"
     print "7) Exit"
-    print "#################################\n"
-    processOptions(manager)
+    print "#################################"
+    processOptions(manager,secretToken)
 
-def processOptions(manager):
+def processOptions(manager,secretToken):
     choice = raw_input("Choice: ")
     if (choice == "1"):
-        listDroplets(manager)
+        listDroplets(manager,secretToken)
     elif (choice == "2"):
-        powerControlDroplets(manager)
+        powerControlDroplets(manager,secretToken)
     elif (choice == "3"):
-        createDroplets(manager)
+        createDropletsMenu(manager,secretToken)
     elif (choice == "4"):
-        destroyDroplets()
+        destroyDroplets(manager,secretToken)
     elif (choice == "5"):
         listImages()
     elif (choice == "6"):
@@ -78,9 +78,9 @@ def processOptions(manager):
 
     raw_input("Press Enter to Continue...")
 
-def listDroplets(manager):
+def listDroplets(manager,secretToken):
     droplets = manager.get_all_droplets()
-    print "\n#################################\n"
+    print "#################################"
     print "1) Show All Droplets"
     print "2) Show Active Droplets"
     print "3) Show Off Droplets"
@@ -100,7 +100,7 @@ def listDroplets(manager):
         print "\nInvalid Choice!"
     
     raw_input("Press Enter to Continue...")
-    menu(manager)
+    menu(manager,secretToken)
 
 def droplet_info(droplet):
     print "#################################"
@@ -111,9 +111,9 @@ def droplet_info(droplet):
     print "Memory:", droplet.size.get("memory")
     print "STATUS:", droplet.status
 
-def powerControlDroplets(manager):
+def powerControlDroplets(manager,secretToken):
     droplets = manager.get_all_droplets()
-    print "\n#################################\n"
+    print "#################################"
     print "1) Shutdown Droplets"
     print "2) Restart (PowerCycle) Droplets"
     print "3) Boot Droplets"
@@ -159,28 +159,30 @@ def powerControlDroplets(manager):
         print "\nInvalid Choice!"
     
     raw_input("Press Enter to Continue...")
-    menu(manager)
+    menu(manager,secretToken)
 
-def createDroplets(manager):
-    createDropletsMenu(manager)
-
-def createDropletsMenu(manager):
+def createDropletsMenu(manager,secretToken):
     #how many droplets?
-    print "\n#################################\n"
+    print "#################################"
     number = ""
     number = raw_input("Number of Droplets to Create: ")
+    if number.isdigit() == False:
+        print "Please input a real number!"
+        raw_input("Press Enter to Continue...")
+        menu(manager,secretToken)
     #if one get its name
     name = False
-    suffix = False
+    prefix = False
     if number == "1":
         name = raw_input("Name of Droplet: ")
     #if more than 1, get a suffix
     elif number > 1:
-        prefix = raw_input("Suffix of droplets: ")
+        prefix = raw_input("Prefix of droplets: ")
     #derp out
     else:
         print "Invalid number!"
-        menu(manager)
+        raw_input("Press Enter to Continue...")
+        menu(manager,secretToken)
 
     #select region to use
     print "#################################"
@@ -210,7 +212,8 @@ def createDropletsMenu(manager):
         region = "tor1"
     else:
         print "Invalid Option!"
-        menu(manager)
+        raw_input("Press Enter to Continue...")
+        menu(manager,secretToken)
 
     #select image to use
     print "#################################"
@@ -225,25 +228,26 @@ def createDropletsMenu(manager):
     print "8) CentOS 7 x64"
     image = ""
     image = raw_input("Image to Use: ")
-    if image == "1"):
+    if image == "1":
         image = "ubuntu-14-04-x32"
-    elif image == "2"):
+    elif image == "2":
         image = "ubuntu-14-04-x64"
-    elif image == "3"):
+    elif image == "3":
         image = "freebsd-10-2-x64"
-    elif image == "4"):
+    elif image == "4":
         image = "fedora-22-x64"
-    elif image == "5"):
+    elif image == "5":
         image = "debian-8-x32"
-    elif image == "6"):
+    elif image == "6":
         image = "debian-8-x64"
-    elif image == "7"):
+    elif image == "7":
         image = "coreos-beta"
-    elif image == "8"):
+    elif image == "8":
         image = "centos-7-0-x64"
     else:
         print "Invalid Option!"
-        menu(manager)
+        raw_input("Press Enter to Continue...")
+        menu(manager,secretToken)
 
     #select slug_size
     print "#################################"
@@ -279,7 +283,8 @@ def createDropletsMenu(manager):
         size = "64gb"
     else:
         print "Invalid Option!"
-        menu(manager)
+        raw_input("Press Enter to Continue...")
+        menu(manager,secretToken)
 
     #backups yes/no
     print "#################################"
@@ -292,13 +297,14 @@ def createDropletsMenu(manager):
         backups = False
     else:
         print "Invalid Option!"
-        menu(manager)
+        raw_input("Press Enter to Continue...")
+        menu(manager,secretToken)
    
     #Final Confirmation
     print "#################################"
     print "!! WARNING !! ACCOUNT WILL BE CHARGED !!"
     print "#################################"
-    print "You are about to create", number, "droplets with the name/suffix of", name, "with the following specs:"
+    print "You are about to create", number, "droplet(s) with the name/suffix of", name, "with the following specs:"
     print "Region:", region
     print "Image:", image
     print "Size:", size
@@ -307,34 +313,86 @@ def createDropletsMenu(manager):
     confirm = raw_input("Are you sure you want to continue? [y/n]: ")
     #if no backout
     if confirm == "n" or confirm == "N":
-        menu(manager)
+        menu(manager,secretToken)
     #if yes launch it
     elif confirm == "y" or confirm == "Y":
         #if multiple, use suffix
-        if suffix:
+        if prefix:
             number = int(number)
-            i = 0
-            while i < number:
-                droplet = do.Droplet(token=initManager.secretToken,
-                        name = suffix + "-" + str(i),
+            i = 1
+            while i <= number:
+                droplet = do.Droplet(token=secretToken,
+                        name = prefix + "-" + str(i),
                         region = region,
                         image = image,
                         size_slug = size,
                         backups = backups)
+                droplet.create()
                 print "Droplet", str(i), "Created"
                 i = i + 1
             print "Droplets successfully created!"
         if name:
-            droplet = do.Droplet(token=initManager.secretToken,
+            droplet = do.Droplet(token=secretToken,
                     name = name,
                     region = region,
                     image = image,
                     size_slug = size,
                     backups = backups)
+            droplet.create()
             print "Droplet successfully created!"
 
-def destroyDroplets(manager):
-    0
+def destroyDroplets(manager,secretToken):
+    droplets = manager.get_all_droplets()
+    print "#################################"
+    print "1) Destroy a single droplet"
+    print "2) Destroy multiple droplets (suffix/contains word)"
+    choice = raw_input("Choice: ")
+    if (choice == "1"):
+        for droplet in droplets:
+            droplet_info(droplet)
+        print "#################################"
+        name = raw_input("Name of Droplet to Destroy: ")
+        print "!! ARE YOU SURE YOU WANT TO DESTROY DROPLET", name + "? !!"
+        confirm = raw_input("[y/n]: ")
+        if confirm == "y" or confirm == "Y":
+            print "Destroying", name +"..."
+            for droplet in droplets:
+                if name == str(droplet.name):
+                    droplet.destroy()
+                    print "Droplet", name, "successfully destroyed"
+        elif confirm =="n" or confirm == "N":
+            raw_input("Press Enter To Continue...")
+            menu(manager,secretToken)
+        else:
+            print "\nInvalid Option!"
+            raw_input("Press Enter To Continue...")
+            menu(manager,secretToken)
+    elif (choice == "2"):
+        for droplet in droplets:
+            droplet_info(droplet)
+        print "#################################"
+        name = raw_input("Suffix or match string of Droplets to Destroy: ")
+        print "!! ARE YOU SURE YOU WANT TO DESTROY DROPLETS LIKE", name + "? !!"
+        confirm = raw_input("[y/n]: ")
+        if confirm == "y" or confirm == "Y":
+            print "Destroying Droplets LIKE", name +"..."
+            for droplet in droplets:
+                if name in str(droplet.name):
+                    droplet.destroy()
+                    print "Droplet", str(droplet.name), "successfully destroyed"
+        elif confirm =="n" or confirm == "N":
+            raw_input("Press Enter To Continue...")
+            menu(manager,secretToken)
+        else:
+            print "\nInvalid Option!"
+            raw_input("Press Enter To Continue...")
+            menu(manager,secretToken)
+        
+    else:
+        print "\nInvalid Option!"
+        raw_input("Press Enter To Continue...")
+        menu(manager,secretToken)
+
 def listImages(manager):
     0
 def advancedMenu(manager):
@@ -342,6 +400,7 @@ def advancedMenu(manager):
 
 if __name__ == "__main__":
     checkSetup()
-    manager = initManager()
-    menu(manager)
+    manager,secretToken = initManager()
+    while True:
+        menu(manager,secretToken)
 
