@@ -6,6 +6,7 @@ Used to manage digital ocean droplets via interactive menu. Dummy Friendly!
 * pyopenssl
 * ndg-httpsclient
 * pyasn1
+
 ```pip install python-digitalocean pyopenssl ndg-httpsclient pyasn1```
 
 ##Overview
