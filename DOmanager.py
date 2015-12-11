@@ -598,6 +598,39 @@ def controlBackups():
         return
     return
 
+def takeSnapshot():
+    try:
+        droplets = manager.get_all_droplets()
+    except do.Error as e:
+        print "ERROR: %s" % e
+        return
+    print "#################################"
+    listDroplets("all",droplets)
+    print "#################################"
+    name = raw_input("Name of Droplet to Take Snapshot On: ")
+    if not name.strip():
+        print "Can't Have Empty Name!"
+        return
+    print "!! ARE YOU SURE YOU WANT TO TAKE SNAPSHOT OF DROPLET", name + "? !!"
+    confirm = raw_input("[y/n]: ")
+    if confirm == "y" or confirm == "Y":
+        snapshotName = raw_input("Save Snapshot As The Name: ")
+        print "Taking Snapshot", snapshotName, "of", name +"..."
+        for droplet in droplets:
+            if name == str(droplet.name):
+                try:
+                    droplet.take_snapshot(snapshotName)
+                except do.Error as e:
+                    print "ERROR: %s" % e
+                    return
+                print "Droplet", name, "successfully Snapshotted as", snapshotName
+    elif confirm =="n" or confirm == "N":
+        return
+    else:
+        print "\nInvalid Option!"
+        return
+    return
+
 def advancedMenu():
     os.system("clear")
     print "#################################"
@@ -607,8 +640,7 @@ def advancedMenu():
     print "2) Reset Droplet Root Password"
     print "3) Enable/Disable Droplet Automated Backups"
     print "4) Snapshot a Droplet"
-    print "5) Resize a Droplet"
-    print "6) Return to Main Menu"
+    print "5) Return to Main Menu"
     processAdvancedOptions()
     return
 
@@ -624,8 +656,6 @@ def processAdvancedOptions():
     elif (choice == "4"):
         takeSnapshot()
     elif (choice == "5"):
-        resizeDroplet()
-    elif (choice == "6"):
         return
     return
 
