@@ -5,11 +5,8 @@ Author: Hunter Gregal
 
 A menu-based manager for a Digital Ocean Account. Manages droplets via account API token and uses the services built-in API. 
 
-Requires: python-digitalocean
-pip install -U python-digitalocean
-
-To Suppress SSL Errors:
-pip install pyopenssl ndg-httpsclient pyasn1
+Install Requirements: 
+pip install -r requirements.txt
 '''
 
 import argparse
