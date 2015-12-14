@@ -3,20 +3,24 @@
 '''
 Author: Hunter Gregal
 
+A menu-based manager for a Digital Ocean Account. Manages droplets via account API token and uses the services built-in API. 
+
 Requires: python-digitalocean
 pip install -U python-digitalocean
 
 To Suppress SSL Errors:
 pip install pyopenssl ndg-httpsclient pyasn1
 '''
+
 import argparse
 import digitalocean as do
 import os, sys
+#debug only
+#from IPython import embed
 
-#Debug
-from IPython import embed
-
+#function init
 def initManager():
+    #get api token from file
     f = open("token.conf", "r")
     secretToken = f.readline()
     f.close()
@@ -25,9 +29,12 @@ def initManager():
     except do.Error as e:
         print "ERROR: %s" % e
         return
+    #return token and socket session
     return manager,secretToken
 
+#function setup
 def setup():
+    #let user add api token to file
     print "Please paste your Digital Ocean API token below"
     token = raw_input("API Token: ")
     config = open("token.conf", "w")
@@ -36,7 +43,9 @@ def setup():
     print "Digital Ocean API Token Succesfully setup!"
     return
 
+#function setupcheck
 def checkSetup():
+    #check for token (empty file)
     if (os.stat("token.conf").st_size == 0):
         print "Digital Ocean API Token Not Configured."
         choice = raw_input("Would you like to configure your API token now? [y/n]: ")
@@ -47,7 +56,9 @@ def checkSetup():
             sys.exit(0)
     return
 
+#function for droplets submenu
 def listDropletsMenu():
+    #choose which droplets to list
     print "#################################"
     print "1) Show All Droplets"
     print "2) Show Active Droplets"
@@ -64,6 +75,7 @@ def listDropletsMenu():
         return
     return
 
+#function to list droplet info
 def listDroplets(status,droplets=False):
     if droplets == False:
         try:
@@ -71,6 +83,7 @@ def listDroplets(status,droplets=False):
         except do.Error as e:
             print "ERROR: %s" % e
             return
+    #return droplets specified by status
     if (status == "all"):
         for droplet in droplets:
                 print "#################################"
@@ -127,17 +140,21 @@ def listDroplets(status,droplets=False):
                 print "STATUS:", droplet.status
     return
 
+#function for powering droplets
 def powerControlDroplets():
     try:
         droplets = manager.get_all_droplets()
     except do.Error as e:
         print "ERROR: %s" % e
         return
+    #Power options
     print "#################################"
     print "1) Shutdown Droplets"
     print "2) Restart (PowerCycle) Droplets"
     print "3) Boot Droplets"
     choice = raw_input("Choice: ")
+    #makes action on droplet
+    #error checks for empty names
     if (choice == "1"):
         listDroplets("active",droplets)
         print "#################################"
@@ -191,6 +208,7 @@ def powerControlDroplets():
         return
     return
 
+#fucntion for creating droplets submenu
 def createDropletsMenu(secretToken):
     #how many droplets?
     print "#################################"
@@ -370,16 +388,19 @@ def createDropletsMenu(secretToken):
             print "Droplet successfully created!"
     return
 
+#function for destroing droplets
 def destroyDroplets():
     try:
         droplets = manager.get_all_droplets()
     except do.Error as e:
         print "ERROR: %s" % e
         return
+    #destroy options
     print "#################################"
     print "1) Destroy a single droplet"
     print "2) Destroy multiple droplets (suffix)"
     choice = raw_input("Choice: ")
+    #destroy droplet specified
     if (choice == "1"):
         listDroplets("all",droplets)
         print "#################################"
@@ -404,6 +425,7 @@ def destroyDroplets():
         else:
             print "\nInvalid Option!"
             return
+    #destroy droplets with prefix
     elif (choice == "2"):
         listDroplets("all",droplets)
         print "#################################"
@@ -431,6 +453,7 @@ def destroyDroplets():
         return
     return
 
+#function to list images
 def listImages():
     try:
         images = manager.get_my_images()
@@ -443,6 +466,7 @@ def listImages():
         i = i + 1
     return
 
+#function to destroy images
 def destroyImages():
     listImages()
     print "#################################"
@@ -470,12 +494,14 @@ def destroyImages():
         return
     return
 
+#functions to reset root of droplet
 def rootReset():
     try:
         droplets = manager.get_all_droplets()
     except do.Error as e:
         print "ERROR: %s" % e
         return
+    #reset options
     print "#################################"
     print "Sends new root password to email!"
     print "#################################"
@@ -506,7 +532,7 @@ def rootReset():
         else:
             print "\nInvalid Option!"
             return
-
+    #reset root on droplets with suffix
     elif (choice == "2"):
         listDroplets("all",droplets)
         print "#################################"
@@ -523,7 +549,7 @@ def rootReset():
                     except do.Error as e:
                         print "ERROR: %s" % e
                         return
-                    print "Droplet", str(droplet.name), "root successfully destroyed"
+                    print "Droplet", str(droplet.name), "root successfully reset"
         elif confirm =="n" or confirm == "N":
             return
         else:
@@ -534,6 +560,7 @@ def rootReset():
         return
     return
 
+#function to manage backups
 def controlBackups():
     try:
         droplets = manager.get_all_droplets()
@@ -598,6 +625,7 @@ def controlBackups():
         return
     return
 
+#function to take snpashot of droplets
 def takeSnapshot():
     try:
         droplets = manager.get_all_droplets()
@@ -631,6 +659,7 @@ def takeSnapshot():
         return
     return
 
+#advances menu function
 def advancedMenu():
     os.system("clear")
     print "#################################"
@@ -644,6 +673,7 @@ def advancedMenu():
     processAdvancedOptions()
     return
 
+#process advanced menu function
 def processAdvancedOptions():
     choice = ""
     choice = raw_input("Choice: ")
@@ -659,6 +689,7 @@ def processAdvancedOptions():
         return
     return
 
+#menu function
 def menu(secretToken):
     os.system("clear")
     print "#################################"
@@ -675,6 +706,7 @@ def menu(secretToken):
     processOptions(secretToken)
     return
 
+#process menu function
 def processOptions(secretToken):
     choice = ""
     choice = raw_input("Choice: ")
@@ -697,9 +729,14 @@ def processOptions(secretToken):
     raw_input("Press Enter to Continue...")
     return
 
+#manin function
 if __name__ == "__main__":
+    #Call checkstup function to check for api token
     checkSetup()
+    #create an api session and grab the session object and token
     manager,secretToken = initManager()
-    embed()
+    #debug mode only
+    #embed()
+    #loop main menu
     while True:
         menu(secretToken)
